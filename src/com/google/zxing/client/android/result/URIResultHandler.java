@@ -30,6 +30,7 @@ import android.app.Activity;
 public final class URIResultHandler extends ResultHandler {
 
   private static final int[] buttons = {
+	  R.string.button_open_wifi,
       R.string.button_open_browser,
       R.string.button_share_by_email,
       R.string.button_share_by_sms,
@@ -56,15 +57,18 @@ public final class URIResultHandler extends ResultHandler {
     String uri = uriResult.getURI();
     switch (index) {
       case 0:
-        openURL(uri);
+    	openWifiSetting();
         break;
       case 1:
-        shareByEmail(uri);
+        openURL(uri);
         break;
       case 2:
-        shareBySMS(uri);
+        shareByEmail(uri);
         break;
       case 3:
+        shareBySMS(uri);
+        break;
+      case 4:
         searchBookContents(uri);
         break;
     }

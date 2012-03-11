@@ -45,6 +45,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -484,8 +485,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
 
     //haha
-    String audioPath = rawResult.getText(); 
-    audioPlay(audioPath);
+    
+    WifiManager wifiManager = (WifiManager) this.getSystemService(WIFI_SERVICE);
+    if(!wifiManager.isWifiEnabled()){
+    	Toast.makeText(
+    			CaptureActivity.this,
+    			"为了保障您读取资源的流畅性，请打开WIFI联接。",
+    			Toast.LENGTH_LONG).show();
+    }
+    
+    
+    
+    //audioPlay(audioPath);
     
     
     TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
@@ -703,11 +714,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   //play the audio media
   //added by heyu   2011-10-13
   public void audioPlay(String audioPath){ 
+	MediaPlayer mediaPlayer = new MediaPlayer();
   	try {
 			if (audioPath == "") {
 				// Tell the user to provide an audio file URL.
 				Toast.makeText(
-						CaptureActivity.this,
+						null,
 						"Please edit MediaPlayer_Audio Activity, "
 								+ "and set the path variable to your audio file path."
 								+ " Your audio file must be stored on sdcard.",
@@ -722,9 +734,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			mediaPlayer.setDataSource(audioPath);
 			mediaPlayer.prepare();
 			mediaPlayer.start();
+//			mediaPlayer.prepareAsync();
 
       } catch (Exception e) {
-          Log.e(TAG, "error: " + e.getMessage(), e);
+    	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
+          builder.setTitle(R.string.app_name);
+          builder.setMessage(R.string.msg_intent_failed);
+          builder.setPositiveButton(R.string.button_ok, null);
+          builder.show();
       }
   }
 }

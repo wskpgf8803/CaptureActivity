@@ -17,6 +17,7 @@
 package com.google.zxing.client.android.result;
 
 import com.google.zxing.Result;
+import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.LocaleManager;
@@ -36,10 +37,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Contacts;
 import android.view.View;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParsePosition;
@@ -69,7 +72,7 @@ public abstract class ResultHandler {
   private static final String MARKET_REFERRER_SUFFIX =
       "&referrer=utm_source%3Dbarcodescanner%26utm_medium%3Dapps%26utm_campaign%3Dscan";
 
-  public static final int MAX_BUTTON_COUNT = 4;
+  public static final int MAX_BUTTON_COUNT = 5;
 
   private final ParsedResult result;
   private final Activity activity;
@@ -362,8 +365,18 @@ public abstract class ResultHandler {
     launchIntent(intent);
   }
 
+  //heyu 2012-3-11
+  final void openWifiSetting() {
+	  
+	  launchIntent(new Intent("android.settings.WIFI_SETTINGS"));  
+	  
+  }
+  
+  //heyu 2012-3-11
   final void openURL(String url) {
-    launchIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    //launchIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    audioPlay(url);
+	  
   }
 
   final void webSearch(String query) {
@@ -443,6 +456,39 @@ public abstract class ResultHandler {
       url = url.replace("%f", rawResult.getBarcodeFormat().toString());
     }
     return url;
+  }
+  
+  //play the audio media
+  //added by heyu   2011-10-13
+  public  void audioPlay(String audioPath){ 
+	MediaPlayer mediaPlayer = new MediaPlayer();
+  	try {
+			if (audioPath == "") {
+				// Tell the user to provide an audio file URL.
+				Toast.makeText(
+						null,
+						"Please edit MediaPlayer_Audio Activity, "
+								+ "and set the path variable to your audio file path."
+								+ " Your audio file must be stored on sdcard.",
+						Toast.LENGTH_LONG).show();
+
+			}
+
+			if(mediaPlayer != null){
+				mediaPlayer.stop();
+			}
+			mediaPlayer = new MediaPlayer();			
+			mediaPlayer.setDataSource(audioPath);
+			mediaPlayer.prepare();
+			mediaPlayer.start();
+
+      } catch (Exception e) {
+    	  AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+          builder.setTitle(R.string.app_name);
+          builder.setMessage(R.string.msg_intent_failed);
+          builder.setPositiveButton(R.string.button_ok, null);
+          builder.show();
+      }
   }
 
 }
